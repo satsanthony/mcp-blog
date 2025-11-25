@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slaying the Token Monster: How MCP Code Execution Reduces Agent Costs by 98%</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #e74c3c;
+            --dark-bg: #2c3e50;
+            --light-bg: #f8f9fa;
+            --code-bg: #2c3e50;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #dee2e6;
+            --highlight-color: #fff3cd;
+        }
+
+        body {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #ffffff;
+            min-height: 100vh;
+        }
+
+        article {
+            background: white;
+            padding: 50px;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .stats-table {
+            width: 100%;
+            margin: 30px 0;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 0;
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+        .stats-table th, .stats-table td {
+            padding: 16px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+        .stats-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .stats-table tbody tr {
+            transition: background-color 0.2s;
+        }
+        .stats-table tbody tr:hover {
+            background-color: var(--light-bg);
+        }
+        .stats-table tbody tr:last-child {
+            font-weight: 600;
+            background-color: var(--highlight-color);
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 0;
+            overflow-x: auto;
+            border-left: 4px solid var(--accent-color);
+            box-shadow: none;
+        }
+        code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.8rem;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--secondary-color);
+            margin-top: 30px;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .author {
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        p {
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        ul, ol {
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .mermaid {
+            margin: 40px 0;
+            padding: 30px;
+            background: var(--light-bg);
+            border-radius: 0;
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .credit-section {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid var(--border-color);
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .credit-section h3 {
+            color: var(--text-primary);
+            margin-top: 0;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .credit-section p {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .credit-section a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .credit-section a:hover {
+            border-bottom-color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            article {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <article>
+        <h1>Slaying the Token Monster: How MCP Code Execution Reduces Agent Costs by 98%</h1>
+        <p class="author" style="color: #1a365d;">By Satish Anthony with a little help from Gemini 3.0 Pro, Google Agent, and Anthropic blog</p>
+	<p>Publish Date: 11/24/2025</p>
+        <p><b>Building AI agents is exciting until you see the bill.</b></p>
+
+        <p>If you've built an agent that interacts with a database or a CRM, you know the pain. A simple request like "summarize the sales leads from last week" can spiral into a token burning nightmare. You load schema definitions, the model requests data, the tool returns a massive JSON blob, the model reads it, filters it, and finally summarizes it.</p>
+
+        <p>In a recent benchmark, Anthropic revealed that a standard workflow involving Google Drive and Salesforce could consume <strong>150,000 tokens</strong>. By shifting to a new architecture called <strong>MCP Code Execution</strong>, they reduced that same workflow to just <strong>2,000 tokens</strong>.</p>
+
+        <p><strong>That is a 98.7% reduction in cost and overhead.</strong></p>
+
+        <p>In this post, we'll dive deep into why the old way is broken, how the new "Agents as Coders" pattern works, and how you can implement it to save money and speed up your AI applications.</p>
+
+        <h2>The Problem: The "Ping Pong" Loop</h2>
+        
+        <p>To understand the solution, we must first look at how the standard Model Context Protocol (MCP)—and indeed most tool calling frameworks—currently works.</p>
+
+        <h3>1. Context Pollution (The Setup Cost)</h3>
+        <p>Before the model even reads the user's prompt, it must "learn" the tools. You inject the JSON schema for every available tool into the system prompt. If you have 50 tools, you are paying for thousands of input tokens on every single request just to define the API.</p>
+
+        <h3>2. The Round Trip Tax (The Execution Cost)</h3>
+        <p>When the model decides to use a tool, it enters a "Ping Pong" loop with your application:</p>
+
+        <ul>
+            <li><strong>Model:</strong> "Call get_sales_records()."</li>
+            <li><strong>App:</strong> Executes function, gets 10,000 rows of data.</li>
+            <li><strong>App:</strong> Sends all 10,000 rows back to the Model as a string.</li>
+            <li><strong>Model:</strong> Reads 10,000 rows (burning output tokens and massive context).</li>
+            <li><strong>Model:</strong> "Filter this list for 'Region: US'."</li>
+            <li><strong>App:</strong> Filters and sends back 500 rows.</li>
+            <li><strong>Model:</strong> "Summarize these 500 rows."</li>
+        </ul>
+
+        <p>Every intermediate step passes through the Large Language Model (LLM). You are paying "intelligent" prices (GPT-4 / Claude 3.5 Sonnet class) for "dumb" work (filtering lists or counting rows).</p>
+
+        <h2>The Solution: Agents as Coders</h2>
+
+        <p>Anthropic's new pattern flips this model on its head. Instead of the LLM acting as a router that calls one tool at a time, the LLM acts as a developer.</p>
+
+        <p><strong>The agent treats your MCP tools not as REST endpoints to be called one by one, but as libraries to be imported into a script.</strong></p>
+
+        <h3>How It Works</h3>
+        <ol>
+            <li><strong>Tool Discovery:</strong> Instead of loading 50 schemas, the agent has a single tool: list_tools() or a filesystem view of available APIs.</li>
+            <li><strong>Code Generation:</strong> The user asks for a summary. The agent writes a Python or TypeScript script to handle the logic.</li>
+            <li><strong>Sandboxed Execution:</strong> The script runs in a secure environment (like a Docker container or Firecracker microVM).</li>
+            <li><strong>Single Result:</strong> The script fetches the data, filters it in memory, computes the summary, and prints only the final answer.</li>
+        </ol>
+
+        <h2>The Difference in Code</h2>
+
+        <h3>The Old Way (Standard Tool Calling)</h3>
+        <p>The LLM context looks like this:</p>
+
+        <pre><code>// STEP 1: Tool Definition (Cost: High)
+[
+  { "name": "get_leads", "parameters": { ... } },
+  { "name": "update_crm", "parameters": { ... } },
+  ... 20 more tools ...
+]
+
+// STEP 2: Intermediate Data (Cost: VERY High)
+User: "Find active leads."
+Model: Call get_leads()
+System: [ ... 5MB of JSON data ... ]
+Model: "Okay, I see 5,000 leads. I will filter them..."</code></pre>
+
+        <h3>The New Way (MCP Code Execution)</h3>
+        <p>The LLM context looks like this:</p>
+
+        <pre><code># The Model writes this script ONCE
+import mcp_tools.salesforce as sf
+import mcp_tools.gdrive as drive
+
+def main():
+    # Fetch data (happens silently in sandbox)
+    leads = sf.get_leads(status="active")
+    
+    # Filter in memory (zero token cost)
+    us_leads = [L for L in leads if L.region == "US"]
+    
+    # Summarize
+    print(f"Found {len(us_leads)} active US leads.")
+
+main()
+
+# Result returned to LLM: "Found 42 active US leads."</code></pre>
+
+        <h2>Visualizing the Architecture</h2>
+        <p>Here is the difference between the "Chatty" approach and the "Code Execution" approach.</p>
+
+        <div class="mermaid">
+flowchart TB
+    subgraph Standard["Standard Tool Calling (High Cost)"]
+        A[User Prompt] --> B(LLM)
+        B -- Call Tool 1 --> C{App Runtime}
+        C -- Return Raw Data --> B
+        B -- Call Tool 2 --> C
+        C -- Return Raw Data --> B
+        B -- Final Answer --> D[User]
+        
+        style C fill:#f9f,stroke:#333,stroke-width:2px
+        style B fill:#ff9,stroke:#333
+    end
+
+    subgraph Execution["MCP Code Execution (Low Cost)"]
+        X[User Prompt] --> Y(LLM)
+        Y -- "Write & Execute Script" --> Z{Secure Sandbox}
+        
+        Z1[Script Logic]
+        Z1 --> T1[Tool A]
+        T1 --> Z1
+        Z1 --> T2[Tool B]
+        T2 --> Z1
+        
+        Z -- "Final Result Only" --> Y
+        Y --> Final[User]
+        
+        style Z fill:#9f9,stroke:#333,stroke-width:2px
+        style Y fill:#ff9,stroke:#333
+    end
+        </div>
+
+        <h2>The Economics: 98.7% Savings</h2>
+        <p>Let's break down the math from Anthropic's case study involving a transcript analysis workflow.</p>
+
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Standard Tool Use</th>
+                    <th>MCP Code Execution</th>
+                    <th>Savings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Context Loading</td>
+                    <td>50+ Tool Schemas</td>
+                    <td>Minimal "FileSystem" API</td>
+                    <td>90%+</td>
+                </tr>
+                <tr>
+                    <td>Data Processing</td>
+                    <td>Raw JSON passed to LLM</td>
+                    <td>Processed in Memory</td>
+                    <td>100%</td>
+                </tr>
+                <tr>
+                    <td>Latency</td>
+                    <td>10+ Network Roundtrips</td>
+                    <td>1 Network Roundtrip</td>
+                    <td>~60% Faster</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Tokens</strong></td>
+                    <td><strong>~150,000</strong></td>
+                    <td><strong>~2,000</strong></td>
+                    <td><strong>98.7%</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Privacy Bonus</h2>
+        <p>Beyond cost, this architecture is a massive win for privacy. If you are processing PII (Personally Identifiable Information) or sensitive financial records, standard tool calling sends that raw data to the LLM provider to be analyzed.</p>
+
+        <p>With Code Execution, the raw data stays inside your secure sandbox. The LLM provider only sees the code it wrote and the anonymous summary result.</p>
+
+        <h2>Technical Deep Dive: Implementing the "Filesystem"</h2>
+        <p>How does the agent know what tools are available if we don't dump schemas into the context?</p>
+
+        <p>The trick is to treat your MCP Server like a directory of files.</p>
+
+        <ul>
+            <li>The agent acts like a developer exploring a new repo.</li>
+            <li>It runs a command like <code>ls /mcp_tools</code> to see available modules.</li>
+            <li>It runs <code>read_file /mcp_tools/salesforce.py</code> to see the specific input parameters for the tool it needs.</li>
+        </ul>
+
+        <p>This "Just-in-Time" discovery means you can expose 1,000 tools to an agent without blowing up its context window. It only "loads" the documentation for the tools it actually decides to import.</p>
+
+        <h3>Prerequisite: The Sandbox</h3>
+        <p>To run this safely, you cannot simply exec() Python on your production server. You need a sandbox. Common solutions include:</p>
+
+        <ul>
+            <li><strong>Docker Containers:</strong> Spin up a transient container for the session.</li>
+            <li><strong>WebAssembly (WASM):</strong> Run code in a lightweight, isolated WASM runtime.</li>
+            <li><strong>MicroVMs:</strong> Tools like Firecracker (used by AWS Lambda) for strong isolation.</li>
+        </ul>
+
+        <h2>Conclusion</h2>
+        <p>We are witnessing a shift from "Chatty Agents" to "Thinking Agents."</p>
+
+        <p>By moving the heavy lifting out of the LLM context window and into a code execution environment, we unlock agents that are faster, cheaper, and more capable. We stop treating LLMs as inefficient database cursors and start treating them as logic engines.</p>
+
+        <p>If you are building MCP servers today, consider exposing your tools not just as API endpoints, but as a library that an agent can script against. Your token budget will thank you.</p>
+
+        <div class="credit-section">
+            <h3>Source & Attribution</h3>
+            <p>This article was derived from and inspired by Anthropic's official blog post on MCP Code Execution and token reduction strategies.</p>
+            <p><strong>Original Source:</strong> <a href="https://www.anthropic.com/news/mcp-code-execution" target="_blank" rel="noopener">Anthropic Model Context Protocol Code Execution</a></p>
+            <p>For the complete technical details, benchmarks, and implementation guidelines, please refer to Anthropic's official documentation and blog.</p>
+        </div>
+    </article>
+</body>
+</html>
