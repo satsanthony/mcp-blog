@@ -211,7 +211,7 @@
 
         <h2>The Problem: The "Ping Pong" Loop</h2>
         
-        <p>To understand the solution, we must first look at how the standard Model Context Protocol (MCP)—and indeed most tool calling frameworks—currently works.</p>
+        <p>To understand the solution, we must first look at how the standard Model Context Protocol (MCP) and indeed most tool calling frameworks currently works.</p>
 
         <h3>1. Context Pollution (The Setup Cost)</h3>
         <p>Before the model even reads the user's prompt, it must "learn" the tools. You inject the JSON schema for every available tool into the system prompt. If you have 50 tools, you are paying for thousands of input tokens on every single request just to define the API.</p>
@@ -402,3 +402,4 @@ flowchart TB
     </article>
 </body>
 </html>
+
